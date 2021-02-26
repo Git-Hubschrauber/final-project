@@ -57,3 +57,49 @@ module.exports.insertNewPW = (email, password) => {
     const params = [email, password];
     return db.query(q, params);
 };
+
+module.exports.insertProfileData = (
+    id,
+    inputAge,
+    inputUsername,
+    inputSex,
+    inputHobbies,
+    inputAbout
+) => {
+    const q = `INSERT INTO editProfileData ( profileOwner_id,
+        age,
+        username,
+        sex,
+        hobbies,
+        about)
+    VALUES (($1), ($2), ($3), ($4), ($5), ($6)) ON CONFLICT (profileOwner_id) DO UPDATE SET age=($2), username=($3), sex=($4), hobbies=($5), about=($6)`;
+    const params = [
+        id,
+        inputAge,
+        inputUsername,
+        inputSex,
+        inputHobbies,
+        inputAbout,
+    ];
+    return db.query(q, params);
+};
+
+module.exports.updateName = (id, inputFirst, inputLast) => {
+    const q = `UPDATE registered_users SET first = ($2), last = ($3) WHERE id = ($1)`;
+    const params = [id, inputFirst, inputLast];
+    return db.query(q, params);
+};
+
+module.exports.getAllUserInfo1 = (id) => {
+    const q = `SELECT *
+    FROM registered_users WHERE registered_users.id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getAllUserInfo2 = (id) => {
+    const q = `SELECT *
+    FROM editProfileData WHERE profileOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};

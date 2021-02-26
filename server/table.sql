@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS reset_password;
+DROP TABLE IF EXISTS editProfileData;
 DROP TABLE IF EXISTS registered_users;
 
 
@@ -17,4 +18,15 @@ CREATE TABLE reset_password(
     email VARCHAR NOT NULL CHECK (email !=''),
     code VARCHAR NOT NULL CHECK (code !=''),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE editProfileData(
+    id SERIAL PRIMARY KEY,
+    profileOwner_id INTEGER NOT NULL UNIQUE REFERENCES registered_users(id),
+    age INTEGER,
+    username VARCHAR(255),
+    sex VARCHAR(255),
+    hobbies VARCHAR(255),
+    about VARCHAR(255)
 );

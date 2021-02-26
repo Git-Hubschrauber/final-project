@@ -197,6 +197,48 @@ app.post("/password/reset/verify", async (req, res) => {
 //
 //
 
+app.get("/api/allUserInfo", async (req, res) => {
+    console.log("api/allUserInfo here");
+    const results1 = await db.getAllUserInfo1(req.session.userId);
+    const results2 = await db.getAllUserInfo2(req.session.userId);
+    const data = { ...results1.rows[0], ...results2.rows[0] };
+
+    console.log("all User Info: ", data);
+    res.json(data);
+});
+
+//
+// Profile
+
+app.post("/api/editProfile", async (req, res) => {
+    console.log("/api/editProfile here");
+    let { first, last, age, username, sex, hobbies, about } = req.body;
+    console.log("/api/editProfile req.body: ", req.body);
+    await db.updateName(req.session.userId, first, last);
+    await db.insertProfileData(
+        req.session.userId,
+        age,
+        username,
+        sex,
+        hobbies,
+        about
+    );
+
+    res.json({ success: true });
+});
+
+//
+//
+//Logout
+app.post("/api/logout", (req, res) => {
+    req.session.userId = null;
+    req.session = null;
+    res.redirect("/welcome");
+});
+
+//
+//
+
 app.get("*", function (req, res) {
     if (!req.session.userId) {
         res.redirect("/welcome");
