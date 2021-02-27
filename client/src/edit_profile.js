@@ -28,7 +28,7 @@ export default function (props) {
     if (!data) {
         return null;
     }
-    console.log("data in edit: ", data.id);
+    console.log("data in edit: ", data.first);
 
     return (
         <div className="editProfile">

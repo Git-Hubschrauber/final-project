@@ -7,7 +7,7 @@ const { hash, compare } = require("./bc");
 const csurf = require("csurf");
 const { sendEmail } = require("./ses");
 const cryptoRandomString = require("crypto-random-string");
-
+const fs = require("fs");
 const db = require("./db");
 
 //
@@ -17,7 +17,9 @@ const uidSafe = require("uid-safe");
 
 const diskStorage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, __dirname + "/uploads");
+        const path = __dirname + "/uploads/" + req.session.userId;
+        fs.mkdirSync(path, { recursive: true });
+        callback(null, path);
     },
     filename: function (req, file, callback) {
         uidSafe(24).then(function (uid) {
@@ -169,8 +171,6 @@ app.post("/password/reset/start", async (req, res) => {
         console.log("err in resetPW start", err);
         res.json({ error: true });
     }
-
-    //
 });
 
 app.post("/password/reset/verify", async (req, res) => {
@@ -224,6 +224,73 @@ app.post("/api/editProfile", async (req, res) => {
         about
     );
 
+    res.json({ success: true });
+});
+
+//
+//
+//SingleDay
+
+app.get("/api/day/:date", async (req, res) => {
+    console.log("/api/day/:date here");
+    console.log("/api/day/:date api req.params: ", req.params.date);
+    const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
+    console.log("/api/day/:date rows: ", rows);
+
+    res.json(rows[0]);
+});
+
+app.get("/api/getDiaryEntries", async (req, res) => {
+    console.log("/api/getDiaryEntries here");
+    const { rows } = await db.getDiaryEntries(req.session.userId);
+    console.log("/api/getDiaryEntries rows: ", rows);
+    res.json(rows);
+});
+
+app.get("/api/getEntryDays", async (req, res) => {
+    console.log("/api/getEntryDays");
+    const { rows } = await db.getEntryDays(req.session.userId);
+    console.log("/api/getEntryDays rows: ", rows);
+    res.json(rows);
+});
+
+app.post("/api/editDiary/:date", async (req, res) => {
+    console.log("api/editDiary/:date here");
+    console.log("api/editDiary/:date req.params: ", req.params);
+    console.log(
+        "api/editDiary/:date req.body.inputFields: ",
+        req.body.selectedDay[1]
+    );
+    console.log(
+        "api/editDiary/:date req.body.selectedDay: ",
+        req.body.selectedDay[0]
+    );
+    await db.insertDiaryInfo(
+        req.session.userId,
+        req.body.selectedDay[0],
+        req.body.selectedDay[1]
+    );
+
+    res.json(req.params.date);
+});
+
+app.post("/api/upload/:date", uploader.single("file"), async (req, res) => {
+    console.log("/api/upload/:date here");
+    console.log("/api/upload/:date req.params: ", req.params.date);
+    // const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
+    // console.log("/api/day/:date rows: ", rows);
+
+    // res.json(rows[0]);
+    res.json({ success: true });
+});
+
+app.post("/api/uploads/:date", uploader.array("files"), async (req, res) => {
+    console.log("/api/uploads/:date here");
+    console.log("/api/uploads/:date req.params: ", req.params.date);
+    // const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
+    // console.log("/api/day/:date rows: ", rows);
+
+    // res.json(rows[0]);
     res.json({ success: true });
 });
 

@@ -1,97 +1,112 @@
-export default function () {
-    // state = {
-    //     rows: [],
-    // };
-    // handleChange = (idx) => (e) => {
-    //     const { name, value } = e.target;
-    //     const rows = [...this.state.rows];
-    //     rows[idx] = {
-    //         [name]: value,
-    //     };
-    //     this.setState({
-    //         rows,
-    //     });
-    // };
-    // handleAddRow = () => {
-    //     const item = {
-    //         name: "",
-    //         mobile: "",
-    //     };
-    //     this.setState({
-    //         rows: [...this.state.rows, item],
-    //     });
-    // };
-    // handleRemoveRow = () => {
-    //     this.setState({
-    //         rows: this.state.rows.slice(0, -1),
-    //     });
-    // };
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { saveInputFields } from "./actions";
+
+export default function (props) {
+    const dispatch = useDispatch();
+
+    const [inputFields, setInputFields] = useState([
+        { title: "", content: "" },
+    ]);
+
+    const selectedDay = props.selectedDay;
+    console.log("props in input tables: ", selectedDay);
+    // inputFields = useSelector((state) => state.inputFields);
+
+    useEffect(
+        (inputFields) => {
+            if (inputFields) {
+                console.log("input changed");
+            }
+        },
+        [inputFields]
+    );
+
+    const handleChange = (index, e) => {
+        console.log(
+            "handleChange name:val: ",
+            e.target.name + ":" + e.target.value,
+            index
+        );
+        const values = [...inputFields];
+        values[index][e.target.name] = e.target.value;
+        setInputFields(values);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log("saved inputFields: ", inputFields);
+
+        dispatch(saveInputFields([selectedDay, inputFields]));
+    };
+
+    const addField = (index) => {
+        // setInputFields([...inputFields, { title: "", content: "" }]);
+        console.log("add index: ", index);
+        const values = [...inputFields];
+        values.splice(index + 1, 0, { title: "", content: "" });
+        setInputFields(values);
+        dispatch(saveInputFields([selectedDay, inputFields]));
+    };
+    const deleteField = (index) => {
+        console.log("delete index: ", index);
+        const values = [...inputFields];
+        values.splice(index, 1);
+        setInputFields(values);
+        dispatch(saveInputFields([selectedDay, inputFields]));
+    };
 
     return (
         <div>
-            <div className="container">
-                <div className="row clearfix">
-                    <div className="col-md-12 column">
-                        <table
-                            className="table table-bordered table-hover"
-                            id="tab_logic"
-                        >
-                            <thead>
-                                <tr>
-                                    <th className="text-center"> # </th>
-                                    <th className="text-center"> Name </th>
-                                    <th className="text-center"> Mobile </th>
-                                </tr>
-                            </thead>
+            <form onSubmit={handleSubmit}>
+                {inputFields.map((inputField, index) => (
+                    <div key={index}>
+                        <table>
                             <tbody>
-                                {/* {this.state.rows.map((item, idx) => (
-                                    <tr id="addr0" key={idx}>
-                                        <td>{idx}</td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={
-                                                    this.state.rows[idx].name
-                                                }
-                                                onChange={this.handleChange(
-                                                    idx
-                                                )}
-                                                className="form-control"
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                name="mobile"
-                                                value={
-                                                    this.state.rows[idx].mobile
-                                                }
-                                                onChange={this.handleChange(
-                                                    idx
-                                                )}
-                                                className="form-control"
-                                            />
-                                        </td>
-                                    </tr>
-                                ))} */}
+                                <tr>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            placeholder="title"
+                                            name="title"
+                                            // defaultValue={
+                                            //     inputField.title
+                                            // }
+                                            onChange={(e) =>
+                                                handleChange(index, e)
+                                            }
+                                        ></input>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            placeholder="content"
+                                            name="content"
+                                            // defaultValue={
+                                            //     inputField.content
+                                            // }
+                                            onChange={(e) =>
+                                                handleChange(index, e)
+                                            }
+                                        />
+                                    </td>
+                                    <td>
+                                        <button onClick={() => addField(index)}>
+                                            +
+                                        </button>
+                                        <button
+                                            onClick={() => deleteField(index)}
+                                        >
+                                            -
+                                        </button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
-                        <button
-                            // onClick={this.handleAddRow}
-                            className="btn btn-default pull-left"
-                        >
-                            Add Row
-                        </button>
-                        <button
-                            // onClick={this.handleRemoveRow}
-                            className="pull-right btn btn-default"
-                        >
-                            Delete Row
-                        </button>
                     </div>
-                </div>
-            </div>
+                ))}
+
+                <button onClick={handleSubmit}>Save</button>
+            </form>
         </div>
     );
 }

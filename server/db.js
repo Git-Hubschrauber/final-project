@@ -58,14 +58,7 @@ module.exports.insertNewPW = (email, password) => {
     return db.query(q, params);
 };
 
-module.exports.insertProfileData = (
-    id,
-    inputAge,
-    inputUsername,
-    inputSex,
-    inputHobbies,
-    inputAbout
-) => {
+module.exports.insertProfileData = (id, age, username, sex, hobbies, about) => {
     const q = `INSERT INTO editProfileData ( profileOwner_id,
         age,
         username,
@@ -73,14 +66,7 @@ module.exports.insertProfileData = (
         hobbies,
         about)
     VALUES (($1), ($2), ($3), ($4), ($5), ($6)) ON CONFLICT (profileOwner_id) DO UPDATE SET age=($2), username=($3), sex=($4), hobbies=($5), about=($6)`;
-    const params = [
-        id,
-        inputAge,
-        inputUsername,
-        inputSex,
-        inputHobbies,
-        inputAbout,
-    ];
+    const params = [id, age, username, sex, hobbies, about];
     return db.query(q, params);
 };
 
@@ -100,6 +86,32 @@ module.exports.getAllUserInfo1 = (id) => {
 module.exports.getAllUserInfo2 = (id) => {
     const q = `SELECT *
     FROM editProfileData WHERE profileOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getDayInfo = (id, date) => {
+    const q = `SELECT *
+    FROM diaryData WHERE diaryOwner_id = ($1) AND date = ($2)`;
+    const params = [id, date];
+    return db.query(q, params);
+};
+
+module.exports.insertDiaryInfo = (id, date, inputFields) => {
+    const q = `INSERT INTO diaryData (diaryOwner_id, date, inputFields) VALUES (($1), ($2), ($3))`;
+    const params = [id, date, inputFields];
+    return db.query(q, params);
+};
+module.exports.getDiaryEntries = (id) => {
+    const q = `SELECT *
+    FROM diaryData WHERE diaryOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getEntryDays = (id) => {
+    const q = `SELECT date
+    FROM diaryData WHERE diaryOwner_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };

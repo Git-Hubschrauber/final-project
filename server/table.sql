@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS reset_password;
+DROP TABLE IF EXISTS diaryData;
 DROP TABLE IF EXISTS editProfileData;
 DROP TABLE IF EXISTS registered_users;
 
@@ -23,10 +24,19 @@ CREATE TABLE reset_password(
 
 CREATE TABLE editProfileData(
     id SERIAL PRIMARY KEY,
-    profileOwner_id INTEGER NOT NULL UNIQUE REFERENCES registered_users(id),
-    age INTEGER,
+    profileOwner_id INTEGER UNIQUE REFERENCES registered_users(id) NOT NULL,
+    age VARCHAR(255),
     username VARCHAR(255),
     sex VARCHAR(255),
     hobbies VARCHAR(255),
     about VARCHAR(255)
+);
+
+CREATE TABLE diaryData(
+    id SERIAL PRIMARY KEY,
+    diaryOwner_id INTEGER,
+    date VARCHAR(255),
+    inputFields VARCHAR[],
+    pictures VARCHAR[],
+    places VARCHAR[]
 );
