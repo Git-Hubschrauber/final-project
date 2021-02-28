@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { saveInputFields } from "./actions";
+import axios from "./axios";
 
 export default function (props) {
     const dispatch = useDispatch();
@@ -13,14 +14,11 @@ export default function (props) {
     console.log("props in input tables: ", selectedDay);
     // inputFields = useSelector((state) => state.inputFields);
 
-    useEffect(
-        (inputFields) => {
-            if (inputFields) {
-                console.log("input changed");
-            }
-        },
-        [inputFields]
-    );
+    // useEffect(() => {
+    //     if (inputFields) {
+    //         console.log("input changed");
+    //     }
+    // }, [inputFields]);
 
     const handleChange = (index, e) => {
         console.log(
@@ -33,11 +31,15 @@ export default function (props) {
         setInputFields(values);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("saved inputFields: ", inputFields);
-
-        dispatch(saveInputFields([selectedDay, inputFields]));
+        try {
+            await axios.post("/api/editDiary/" + selectedDay, inputFields);
+            dispatch(saveInputFields(inputFields));
+        } catch (err) {
+            console.log("error in saveInputFields", err);
+        }
     };
 
     const addField = (index) => {
@@ -57,14 +59,14 @@ export default function (props) {
     };
 
     return (
-        <div>
+        <div className="inputTable">
             <form onSubmit={handleSubmit}>
                 {inputFields.map((inputField, index) => (
                     <div key={index}>
                         <table>
                             <tbody>
                                 <tr>
-                                    <td>
+                                    <td className="tableCol1">
                                         <input
                                             type="text"
                                             placeholder="title"
@@ -77,7 +79,7 @@ export default function (props) {
                                             }
                                         ></input>
                                     </td>
-                                    <td>
+                                    <td className="tableCol2">
                                         <textarea
                                             placeholder="content"
                                             name="content"
@@ -105,7 +107,9 @@ export default function (props) {
                     </div>
                 ))}
 
-                <button onClick={handleSubmit}>Save</button>
+                <button className="saveBtn" onClick={handleSubmit}>
+                    Save
+                </button>
             </form>
         </div>
     );

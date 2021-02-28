@@ -11,6 +11,7 @@ import SingleDay from "./singleDay";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { importProfile } from "./actions";
+import Maps from "./maps";
 
 import { Link } from "react-router-dom";
 
@@ -31,38 +32,58 @@ export default function () {
     if (!data) {
         return null;
     }
-
+    console.log("app profPic: ", data.profilPic);
     return (
         <BrowserRouter>
             <div>
-                <Logout />
-                <Route
-                    path="*"
-                    render={(props) => (
-                        <DatePicker
-                            key={props.match.url}
-                            match={props.match}
-                            history={props.history}
+                <div className="topnav">
+                    <div className="datePicker">
+                        <Route
+                            path="*"
+                            render={(props) => (
+                                <DatePicker
+                                    key={props.match.url}
+                                    match={props.match}
+                                    history={props.history}
+                                />
+                            )}
                         />
-                    )}
-                />
-                <h4>{data.first + " " + data.last}</h4>
+                    </div>
+                    <h2>
+                        <Link to="/">Main</Link>
+                    </h2>
+                    <h2>
+                        <Link to="/profile">Profile</Link>
+                    </h2>
 
-                <h2>
-                    <Link to="/editProfile">Edit your profile</Link>
-                </h2>
+                    <h2>
+                        <Link to="/Map">Map</Link>
+                    </h2>
+                    <h2>
+                        <Link to="/Pictures">Pictures</Link>
+                    </h2>
+                    <h2>
+                        <Link to="/Entries">Entries</Link>
+                    </h2>
+                    <h2>
+                        <Link to="/Search">Search</Link>
+                    </h2>
 
-                <h2>
-                    <Link to="/profile">Your profile</Link>
-                </h2>
+                    <h2 className="navName">{data.first + " " + data.last}</h2>
+                    <img
+                        className="navPic"
+                        src={data.profilPic || "/default.png"}
+                    />
 
+                    <Logout />
+                </div>
                 <Route
                     exact
                     path="/"
                     render={() => (
                         <div>
                             <h1>Welcome / main page</h1>
-
+                            {/* <Maps /> */}
                             {/* <TimePicker /> */}
                         </div>
                     )}
@@ -75,6 +96,7 @@ export default function () {
                             key={props.match.url}
                             match={props.match}
                             history={props.history}
+                            data={props.data}
                         />
                     )}
                 />

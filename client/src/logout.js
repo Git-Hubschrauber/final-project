@@ -12,5 +12,9 @@ async function logout() {
 }
 
 export default function () {
-    return <button onClick={() => logout()}>LOGOUT</button>;
+    return (
+        <button className="logoutBtn" onClick={() => logout()}>
+            LOGOUT
+        </button>
+    );
 }

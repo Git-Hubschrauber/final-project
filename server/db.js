@@ -76,6 +76,18 @@ module.exports.updateName = (id, inputFirst, inputLast) => {
     return db.query(q, params);
 };
 
+module.exports.updateProfilePic = (id, profilePic) => {
+    const q = `UPDATE registered_users SET profilePic = ($2) WHERE id =($1)`;
+    const params = [id, profilePic];
+    return db.query(q, params);
+};
+
+module.exports.deleteImage = (id, def) => {
+    const q = `UPDATE users SET profile_pic_url = ($2) WHERE id =($1)`;
+    const params = [id, def];
+    return db.query(q, params);
+};
+
 module.exports.getAllUserInfo1 = (id) => {
     const q = `SELECT *
     FROM registered_users WHERE registered_users.id = ($1)`;
@@ -113,5 +125,11 @@ module.exports.getEntryDays = (id) => {
     const q = `SELECT date
     FROM diaryData WHERE diaryOwner_id = ($1)`;
     const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.insertPictureData = (id, date, pictures) => {
+    const q = `INSERT INTO pictureData (pictureOwner_id, date, pictures) VALUES (($1), ($2), ($3))`;
+    const params = [id, date, pictures];
     return db.query(q, params);
 };

@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS reset_password;
 DROP TABLE IF EXISTS diaryData;
+DROP TABLE IF EXISTS pictureData;
 DROP TABLE IF EXISTS editProfileData;
 DROP TABLE IF EXISTS registered_users;
 
@@ -10,7 +11,7 @@ CREATE TABLE registered_users (
       last VARCHAR(255) NOT NULL CHECK (last !=''),
       email VARCHAR(255) NOT NULL UNIQUE CHECK (email !=''),
       password VARCHAR(255) NOT NULL  CHECK (password !=''),
-      profile_pic_url VARCHAR(255),
+      profilePic VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -36,7 +37,14 @@ CREATE TABLE diaryData(
     id SERIAL PRIMARY KEY,
     diaryOwner_id INTEGER,
     date VARCHAR(255),
-    inputFields VARCHAR[],
-    pictures VARCHAR[],
-    places VARCHAR[]
+    inputFields VARCHAR,
+   
+);
+
+
+CREATE TABLE pictureData(
+    id SERIAL PRIMARY KEY,
+    pictureOwner_id INTEGER,
+    date VARCHAR(255),
+    pictures VARCHAR,
 );

@@ -18,10 +18,8 @@ export default function (props) {
         console.log("upload clicked");
         const formData = new FormData();
         formData.append("file", file);
-        console.log("singleFormData: ", formData);
+        console.log("singleFormData: ", file);
         let response = await axios.post("/api/upload/" + selectedDay, formData);
-        console.log("url in uploader: ", response.data.url);
-        // await this.props.setProfilePictureUrl(response.data.url);
     };
 
     const fileSelectHandler2 = (e) => {

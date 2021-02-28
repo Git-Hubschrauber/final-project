@@ -118,25 +118,30 @@ app.post("/registration", async (req, res) => {
 //Login
 app.post("/login/userlogin", async (req, res) => {
     console.log("/login post route here: ", req.body.email);
-    const { rows } = await db.checkEmailRegistration(req.body.email);
+    try {
+        const { rows } = await db.checkEmailRegistration(req.body.email);
 
-    let checkedEmail = rows[0].email;
+        let checkedEmail = rows[0].email;
 
-    if (checkedEmail == req.body.email) {
-        let result = await db.getPassword(checkedEmail);
-        let hashFromDB = result.rows[0].password;
-        let match = await compare(req.body.password, hashFromDB);
+        if (checkedEmail == req.body.email) {
+            let result = await db.getPassword(checkedEmail);
+            let hashFromDB = result.rows[0].password;
+            let match = await compare(req.body.password, hashFromDB);
 
-        if (match) {
-            let results = await db.getRegId(checkedEmail);
-            req.session.userId = results.rows[0].id;
+            if (match) {
+                let results = await db.getRegId(checkedEmail);
+                req.session.userId = results.rows[0].id;
 
-            console.log("userId in login: ", results.rows[0].id);
-            res.json(results.rows[0].id);
-        } else {
-            console.log("err in compare2");
-            res.json({ login_error: true });
+                console.log("userId in login: ", results.rows[0].id);
+                res.json(results.rows[0].id);
+            } else {
+                console.log("err in compare2");
+                res.json({ login_error: true });
+            }
         }
+    } catch (err) {
+        console.log("error in login: ", err);
+        res.json({ login_error: true });
     }
 });
 
@@ -199,12 +204,17 @@ app.post("/password/reset/verify", async (req, res) => {
 
 app.get("/api/allUserInfo", async (req, res) => {
     console.log("api/allUserInfo here");
-    const results1 = await db.getAllUserInfo1(req.session.userId);
-    const results2 = await db.getAllUserInfo2(req.session.userId);
-    const data = { ...results1.rows[0], ...results2.rows[0] };
+    try {
+        const results1 = await db.getAllUserInfo1(req.session.userId);
+        const results2 = await db.getAllUserInfo2(req.session.userId);
+        const data = { ...results1.rows[0], ...results2.rows[0] };
 
-    console.log("all User Info: ", data);
-    res.json(data);
+        console.log("all User Info: ", data);
+        res.json(data);
+    } catch (err) {
+        console.log("error in /api/allUserInfo: ", err);
+        res.json({ error: true });
+    }
 });
 
 //
@@ -212,21 +222,54 @@ app.get("/api/allUserInfo", async (req, res) => {
 
 app.post("/api/editProfile", async (req, res) => {
     console.log("/api/editProfile here");
-    let { first, last, age, username, sex, hobbies, about } = req.body;
-    console.log("/api/editProfile req.body: ", req.body);
-    await db.updateName(req.session.userId, first, last);
-    await db.insertProfileData(
-        req.session.userId,
-        age,
-        username,
-        sex,
-        hobbies,
-        about
-    );
+    try {
+        let { first, last, age, username, sex, hobbies, about } = req.body;
+        console.log("/api/editProfile req.body: ", req.body);
+        await db.updateName(req.session.userId, first, last);
+        await db.insertProfileData(
+            req.session.userId,
+            age,
+            username,
+            sex,
+            hobbies,
+            about
+        );
 
-    res.json({ success: true });
+        res.json({ success: true });
+    } catch (err) {
+        console.log("error in /api/editProfile: ", err);
+        res.json({ error: true });
+    }
 });
 
+app.post("/api/uploadProfilePic/", async (req, res) => {
+    console.log("/api/uploadProfilePic/ here");
+    try {
+        let { profilePic } = req.body;
+        console.log("/api/Profile´Pic req.body: ", req.body);
+        await db.updateProfilePic(req.session.userId, profilePic);
+        res.json(profilePic);
+    } catch (err) {
+        console.log("error in api/uploadProfilePic/: ", err);
+        res.json({ error: true });
+    }
+});
+
+app.post("/deleteProfilePic", async (req, res) => {
+    const def = ["/default.png"];
+
+    console.log("/delete here");
+    try {
+        await db.deleteImage(req.session.userId, def);
+
+        res.json({
+            sucess: true,
+        });
+    } catch (err) {
+        console.log("error in api/deleteProfilePic/: ", err);
+        res.json({ error: true });
+    }
+});
 //
 //
 //SingleDay
@@ -234,50 +277,80 @@ app.post("/api/editProfile", async (req, res) => {
 app.get("/api/day/:date", async (req, res) => {
     console.log("/api/day/:date here");
     console.log("/api/day/:date api req.params: ", req.params.date);
-    const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
-    console.log("/api/day/:date rows: ", rows);
+    try {
+        const { rows } = await db.getDayInfo(
+            req.session.userId,
+            req.params.date
+        );
+        console.log("/api/day/:date rows: ", rows);
 
-    res.json(rows[0]);
+        res.json(rows[0]);
+    } catch (err) {
+        console.log("error in /api/day/:date ", err);
+        res.json({ error: true });
+    }
+});
+
+app.get("/api/images/:date", async (req, res) => {
+    console.log("/api/images/:date here");
+    console.log("//api/images/:date req.params: ", req.params.date);
+    try {
+        const { rows } = await db.getImagesForDayInfo(
+            req.session.userId,
+            req.params.date
+        );
+        console.log("/api/images/:date rows: ", rows);
+
+        res.json(rows[0]);
+    } catch (err) {
+        console.log("error in /api/images/:date ", err);
+        res.json({ error: true });
+    }
 });
 
 app.get("/api/getDiaryEntries", async (req, res) => {
     console.log("/api/getDiaryEntries here");
-    const { rows } = await db.getDiaryEntries(req.session.userId);
-    console.log("/api/getDiaryEntries rows: ", rows);
-    res.json(rows);
+    try {
+        const { rows } = await db.getDiaryEntries(req.session.userId);
+        console.log("/api/getDiaryEntries rows: ", rows);
+        res.json(rows);
+    } catch (err) {
+        console.log("error in /api/getDiaryEntries: ", err);
+        res.json({ error: true });
+    }
 });
 
 app.get("/api/getEntryDays", async (req, res) => {
     console.log("/api/getEntryDays");
-    const { rows } = await db.getEntryDays(req.session.userId);
-    console.log("/api/getEntryDays rows: ", rows);
-    res.json(rows);
+    try {
+        const { rows } = await db.getEntryDays(req.session.userId);
+        console.log("/api/getEntryDays rows: ", rows);
+        res.json(rows);
+    } catch (err) {
+        console.log("error in /api/getEntryDays: ", err);
+        res.json({ error: true });
+    }
 });
 
 app.post("/api/editDiary/:date", async (req, res) => {
     console.log("api/editDiary/:date here");
-    console.log("api/editDiary/:date req.params: ", req.params);
-    console.log(
-        "api/editDiary/:date req.body.inputFields: ",
-        req.body.selectedDay[1]
-    );
-    console.log(
-        "api/editDiary/:date req.body.selectedDay: ",
-        req.body.selectedDay[0]
-    );
-    await db.insertDiaryInfo(
-        req.session.userId,
-        req.body.selectedDay[0],
-        req.body.selectedDay[1]
-    );
+    console.log("api/editDiary/:date req.params: ", req.params.date);
+    console.log("api/editDiary/:date req.body: ", req.body);
+    try {
+        await db.insertDiaryInfo(req.session.userId, req.params.date, req.body);
 
-    res.json(req.params.date);
+        res.json(req.params.date);
+    } catch (err) {
+        console.log("error in /api/editDiary/:date ", err);
+        res.json({ error: true });
+    }
 });
 
 app.post("/api/upload/:date", uploader.single("file"), async (req, res) => {
     console.log("/api/upload/:date here");
+    console.log("/api/upload/:date req.body: ", req.body);
     console.log("/api/upload/:date req.params: ", req.params.date);
-    // const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
+    // const { rows } = await db.insertPictureData(req.session.userId, req.params.date);
     // console.log("/api/day/:date rows: ", rows);
 
     // res.json(rows[0]);
@@ -287,7 +360,7 @@ app.post("/api/upload/:date", uploader.single("file"), async (req, res) => {
 app.post("/api/uploads/:date", uploader.array("files"), async (req, res) => {
     console.log("/api/uploads/:date here");
     console.log("/api/uploads/:date req.params: ", req.params.date);
-    // const { rows } = await db.getDayInfo(req.session.userId, req.params.date);
+    // const { rows } = await db.insertPictureData(req.session.userId, req.params.date);
     // console.log("/api/day/:date rows: ", rows);
 
     // res.json(rows[0]);

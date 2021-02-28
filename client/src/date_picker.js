@@ -10,7 +10,6 @@ export default function (props) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const dispatch = useDispatch();
     useEffect(() => {
-        console.log("useeffect date_picker here: ");
         dispatch(getEntryDays());
     }, []);
 
@@ -18,14 +17,11 @@ export default function (props) {
     let arrayMarkedDays;
     if (markedDays) {
         arrayMarkedDays = markedDays.map((e) => new Date(e.date));
-        console.log("marked days in date_picker: ", arrayMarkedDays);
-        console.log("new Date: ", new Date("2021-02-20"));
     }
     return (
         <div>
             <DatePicker
                 placeholderText="Click here and pick a date"
-                // selected={selectedDate}
                 onChange={(date) => {
                     console.log(
                         "clicked date: ",

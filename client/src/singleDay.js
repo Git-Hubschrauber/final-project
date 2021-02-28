@@ -1,7 +1,8 @@
+import axios from "./axios";
 import BackBtn from "./hooks/backBtn";
 import InputTable from "./input_table";
 import Uploader from "./uploader";
-import { getDayInfo } from "./actions";
+import { getDayInfo, getImagesOfDay } from "./actions";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { format } from "date-fns";
@@ -14,8 +15,13 @@ export default function (props) {
         console.log("useeffect single day props here: ", props);
         dispatch(getDayInfo(selectedDay));
     }, []);
+    useEffect(() => {
+        console.log("useeffect single day props here: ", props);
+        dispatch(getImagesOfDay(selectedDay));
+    }, []);
 
     const dbInputFields = useSelector((state) => state.inputFields);
+    const picsOfDay = useSelector((state) => state.picsOfDay);
     let displayElement;
     if (!dbInputFields) {
         return (displayElement = (
@@ -40,6 +46,7 @@ export default function (props) {
                 {dbInputFields.map((element, index) => (
                     <div key={index}>
                         <h2>{element}</h2>
+                        <h2>Content to display</h2>
                     </div>
                 ))}
             </div>
@@ -48,8 +55,10 @@ export default function (props) {
 
     return (
         <div>
-            <h1>{format(new Date(selectedDay), "dd. MMMM yyyy (eeee)")}</h1>
-            <div>{displayElement} </div>
+            <h1 className="dateOfDay">
+                {format(new Date(selectedDay), "dd. MMMM yyyy (eeee)")}
+            </h1>
+            <div className="displayElementContainer">{displayElement} </div>
             <InputTable selectedDay={selectedDay} />
             <Uploader selectedDay={selectedDay} />
             <BackBtn />

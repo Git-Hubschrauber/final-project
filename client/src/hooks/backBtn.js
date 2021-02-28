@@ -5,7 +5,7 @@ export default function () {
     const history = useHistory();
     return (
         <Link to="/">
-            <button>back</button>
+            <button className="backBtn">back</button>
         </Link>
     );
 }

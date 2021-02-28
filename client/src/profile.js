@@ -1,26 +1,84 @@
 import BackBtn from "./hooks/backBtn";
-import { useDispatch, useSelector } from "react-redux";
-import { saveProfile } from "./actions";
-import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
+import { Link } from "react-router-dom";
 
 export default function () {
     const profile_data = useSelector((state) => state.profile_data);
     console.log("profile_data in /profile: ", profile_data);
-    const { first, last, age, username, sex, hobbies, about } = profile_data;
+    const {
+        first,
+        last,
+        age,
+        username,
+        sex,
+        hobbies,
+        about,
+        profilePic,
+    } = profile_data;
 
     return (
         <div className="profile">
-            <h1>your profile</h1>
-            <h3>Firstname: {first}</h3>
-            <h3>Lastname: {last}</h3>
-            <h3>Age: {age}</h3>
+            <div className="flexbox1">
+                <img
+                    className="profPicInProfile"
+                    src={profilePic || "/default.png"}
+                />
+            </div>
+            <div>
+                <h1>Profile</h1>
 
-            <h3>Sex: {sex}</h3>
+                <table className="flexbox1">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h3>Firstname: </h3>
+                            </td>
+                            <td>{first}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>Lastname: </h3>
+                            </td>
+                            <td>{last}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>Age:</h3>
+                            </td>
+                            <td>{age}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>Sex:</h3>
+                            </td>
+                            <td>{sex}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>Username:</h3>
+                            </td>
+                            <td>{username}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>Hobbies: </h3>
+                            </td>
+                            <td>{hobbies}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3>About yourself:</h3>
+                            </td>
+                            <td>{about}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <Link to="/editprofile">
+                    <button className="editprofileBtn">Edit Profile</button>
+                </Link>
+            </div>
 
-            <h3>Username: {username}</h3>
-            <h3>Hobbies: {hobbies}</h3>
-
-            <p>About yourself: {about}</p>
             <BackBtn />
         </div>
     );
