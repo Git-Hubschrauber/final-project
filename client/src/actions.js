@@ -33,6 +33,18 @@ export async function importProfile(profile_data) {
     }
 }
 
+export async function changeProfilePic(profilepic) {
+    try {
+        console.log("Import Profile_data in actions: ", profilepic);
+        return {
+            type: "CHANGE_PROFILE_PIC",
+            profilepic,
+        };
+    } catch (err) {
+        console.log("error in import Profile", err);
+    }
+}
+
 export async function getDayInfo(props) {
     console.log("getDayInfo props in action.js: ", props);
 
@@ -58,7 +70,10 @@ export async function getEntryDays() {
     try {
         const results = await axios.get("/api/getEntryDays");
 
-        console.log("getEntryDays after axios action: ", results.data);
+        console.log(
+            "getEntryDays after axios action: ",
+            results.data.diary_date
+        );
         const entryDays = results.data;
         return {
             type: "ENTRYDAYS",
@@ -89,7 +104,8 @@ export async function getImagesOfDay(selectedDay) {
 
     try {
         const results = await axios.get("/api/images/" + selectedDay);
-        console.log("getImagesOfDay results in action.js: ", results);
+        console.log("getImagesOfDay results in action.js: ", results.data);
+        const picsOfDay = results.data;
         return {
             type: "IMAGES_OF_DAY",
             picsOfDay,
@@ -97,4 +113,13 @@ export async function getImagesOfDay(selectedDay) {
     } catch (err) {
         console.log("error in getImagesOfDay", err);
     }
+}
+
+export async function addNewPictures(picsOfDay) {
+    console.log("addNewPictures: ", picsOfDay);
+
+    return {
+        type: "NEW_IMAGES_ADDED",
+        picsOfDay,
+    };
 }

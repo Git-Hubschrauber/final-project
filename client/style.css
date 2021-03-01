@@ -168,8 +168,21 @@ input {
     top: 10%;
 }
 
+.profPicInUploader {
+    height: 250px;
+    width: 250px;
+    position: absolute;
+    left: 27.5%;
+    top: 10%;
+}
+
 .dateOfDay {
     text-align: center;
+}
+
+.singleDayContainer {
+    width: 100vw;
+    height: fit-content;
 }
 
 .inputTable {
@@ -198,6 +211,28 @@ input {
     width: 90%;
 }
 
+.entryTable {
+    width: 100vw;
+    margin: 0;
+}
+.entryTable table {
+    margin-left: 4%;
+    width: 80%;
+}
+
+.entryCol1 {
+    position: relative;
+    width: 10%;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+.entryCol2 {
+    position: relative;
+    width: 50%;
+    left: 20px;
+
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 .displayElementContainer {
     width: 100vw;
     background-color: rgba(0, 100, 139, 0.2);
@@ -208,6 +243,11 @@ input {
     position: absolute;
     bottom: 5vh;
     left: 90vw;
+}
+.backBtn2 {
+    position: absolute;
+    top: 15px;
+    left: 50vw;
 }
 
 .aboutYourself {
@@ -239,4 +279,29 @@ input {
     position: relative;
     width: 100px;
     left: -50px;
+}
+
+.picGallery {
+    margin-left: 5vw;
+    display: flex;
+    flex-wrap: wrap;
+}
+.galleryImg {
+    height: 200px;
+}
+
+.uploadBtns {
+    display: inline-flex;
+    margin: 30px;
+    position: relative;
+    left: 37.5%;
+}
+
+.uploadBtn1,
+.uploadBtn2 {
+    margin: 15px;
+}
+
+.pictureGalleryHeadlines {
+    margin-left: 5vw;
 }

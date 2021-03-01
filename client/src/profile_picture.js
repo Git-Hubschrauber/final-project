@@ -2,10 +2,12 @@ import axios from "./axios";
 // import React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { changeProfilePic } from "./actions";
 
 export default function (props) {
     const selectedDay = props.selectedDay;
-
+    const dispatch = useDispatch();
+    const data = useSelector((state) => state.profile_data);
     const [showUploader1, setUploader1] = useState(false);
 
     let file;
@@ -15,12 +17,14 @@ export default function (props) {
     };
 
     const submitProfilePic = async () => {
-        console.log("upload clicked");
+        console.log("upload clicked: ", file);
         const formData = new FormData();
         formData.append("file", file);
 
         let response = await axios.post("/api/uploadProfilePic/", formData);
         console.log("axios resp. profilepic: ", response);
+        dispatch(changeProfilePic(response.data));
+        setUploader1(false);
     };
 
     // const delete = async () => {
@@ -37,6 +41,10 @@ export default function (props) {
             <div>
                 <div className="uploaderOverlay"></div>
                 <div className="uploader">
+                    <img
+                        className="profPicInUploader"
+                        src={data.profilepic || "/default.png"}
+                    />
                     <button
                         className="closeUploader"
                         onClick={() => setUploader1(false)}

@@ -16,7 +16,7 @@ export default function (props) {
     const markedDays = useSelector((state) => state.entryDays);
     let arrayMarkedDays;
     if (markedDays) {
-        arrayMarkedDays = markedDays.map((e) => new Date(e.date));
+        arrayMarkedDays = markedDays.map((e) => new Date(e.diary_date));
     }
     return (
         <div>

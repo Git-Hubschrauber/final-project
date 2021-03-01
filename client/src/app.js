@@ -18,13 +18,15 @@ import { Link } from "react-router-dom";
 import { BrowserRouter, Route } from "react-router-dom";
 // import BioEditor from "./bio-editor";
 
-export default function () {
+export default function App() {
     const dispatch = useDispatch();
-    useEffect(async () => {
-        console.log("app - useeffect here");
-        const { data } = await axios.get("api/allUserInfo");
-        console.log("app - allUserInfo id: ", data);
-        dispatch(importProfile(data));
+    useEffect(() => {
+        (async () => {
+            console.log("app - useeffect here");
+            const { data } = await axios.get("/api/allUserInfo");
+            console.log("app - allUserInfo id: ", data);
+            dispatch(importProfile(data));
+        })();
     }, []);
 
     const data = useSelector((state) => state.profile_data);
@@ -32,7 +34,7 @@ export default function () {
     if (!data) {
         return null;
     }
-    console.log("app profPic: ", data.profilPic);
+    console.log("data in app: ", data);
     return (
         <BrowserRouter>
             <div>
@@ -72,7 +74,7 @@ export default function () {
                     <h2 className="navName">{data.first + " " + data.last}</h2>
                     <img
                         className="navPic"
-                        src={data.profilPic || "/default.png"}
+                        src={data.profilepic || "/default.png"}
                     />
 
                     <Logout />
@@ -83,7 +85,7 @@ export default function () {
                     render={() => (
                         <div>
                             <h1>Welcome / main page</h1>
-                            {/* <Maps /> */}
+                            <Maps />
                             {/* <TimePicker /> */}
                         </div>
                     )}

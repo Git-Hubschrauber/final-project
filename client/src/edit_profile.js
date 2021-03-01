@@ -33,12 +33,16 @@ export default function (props) {
         return null;
     }
     console.log("data in edit: ", data.first);
+    const profilepic = data.profilepic;
 
     return (
         <div className="profile">
             <div className="flexbox1">
                 <div className="profPicInProfileContainer">
-                    <img className="profPicInProfile" src={"/default.png"} />
+                    <img
+                        className="profPicInProfile"
+                        src={data.profilepic || "/default.png"}
+                    />
                     <ProfilePic />{" "}
                 </div>
             </div>
@@ -184,6 +188,7 @@ export default function (props) {
                             saveProfile({
                                 first,
                                 last,
+                                profilepic,
                                 age,
                                 username,
                                 sex,

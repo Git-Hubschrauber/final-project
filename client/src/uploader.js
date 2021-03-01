@@ -2,9 +2,13 @@ import axios from "./axios";
 // import React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { addNewPictures } from "./actions";
+import BackBtn from "./hooks/backBtn";
+import { useHistory, Link } from "react-router-dom";
 
 export default function (props) {
     const selectedDay = props.selectedDay;
+    const dispatch = useDispatch();
 
     const [showUploader1, setUploader1] = useState(false);
     const [showUploader2, setUploader2] = useState(false);
@@ -20,6 +24,9 @@ export default function (props) {
         formData.append("file", file);
         console.log("singleFormData: ", file);
         let response = await axios.post("/api/upload/" + selectedDay, formData);
+        console.log("response in uploader 1: ", response.data);
+        dispatch(addNewPictures(response.data));
+        setUploader1(false);
     };
 
     const fileSelectHandler2 = (e) => {
@@ -36,6 +43,9 @@ export default function (props) {
             "/api/uploads/" + selectedDay,
             formData
         );
+        console.log("response in uploader 2: ", response.data);
+        response.data.map((e) => dispatch(addNewPictures(e)));
+        setUploader2(false);
     };
 
     let uploadModal1;
@@ -125,11 +135,18 @@ export default function (props) {
     }
 
     return (
-        <div>
-            <button onClick={() => setUploader1(true)}>Upload a photo</button>
+        <div className="uploadBtns">
+            <button className="uploadBtn1" onClick={() => setUploader1(true)}>
+                Upload a photo
+            </button>
             <div>{uploadModal1}</div>
-            <button onClick={() => setUploader2(true)}>Upload photos</button>
+            <button className="uploadBtn2 " onClick={() => setUploader2(true)}>
+                Upload photos
+            </button>
             <div>{uploadModal2}</div>
+            <Link to="/">
+                <button className="backBtn2">back</button>
+            </Link>
         </div>
     );
 }

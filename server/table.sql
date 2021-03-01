@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS reset_password;
-DROP TABLE IF EXISTS diaryData;
 DROP TABLE IF EXISTS pictureData;
+DROP TABLE IF EXISTS diaryData;
 DROP TABLE IF EXISTS editProfileData;
 DROP TABLE IF EXISTS registered_users;
 
@@ -36,15 +36,14 @@ CREATE TABLE editProfileData(
 CREATE TABLE diaryData(
     id SERIAL PRIMARY KEY,
     diaryOwner_id INTEGER,
-    date VARCHAR(255),
-    inputFields VARCHAR,
-   
+    diary_date VARCHAR(255),
+    inputFields VARCHAR[]
 );
 
 
 CREATE TABLE pictureData(
     id SERIAL PRIMARY KEY,
     pictureOwner_id INTEGER,
-    date VARCHAR(255),
-    pictures VARCHAR,
+    pic_date VARCHAR(255),
+    pictures VARCHAR[]
 );

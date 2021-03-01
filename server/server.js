@@ -66,7 +66,7 @@ app.use(function (req, res, next) {
 app.use(compression());
 
 app.use(express.static(path.join(__dirname, "..", "client", "public")));
-// app.use(express.static(path.join(__dirname, "..", "server", "uploads")));
+app.use(express.static(path.join(__dirname, "..", "server", "uploads")));
 
 //
 //
@@ -242,18 +242,23 @@ app.post("/api/editProfile", async (req, res) => {
     }
 });
 
-app.post("/api/uploadProfilePic/", async (req, res) => {
-    console.log("/api/uploadProfilePic/ here");
-    try {
-        let { profilePic } = req.body;
-        console.log("/api/Profile´Pic req.body: ", req.body);
-        await db.updateProfilePic(req.session.userId, profilePic);
-        res.json(profilePic);
-    } catch (err) {
-        console.log("error in api/uploadProfilePic/: ", err);
-        res.json({ error: true });
+app.post(
+    "/api/uploadProfilePic/",
+    uploader.single("file"),
+    async (req, res) => {
+        console.log("/api/uploadProfilePic/ here");
+        try {
+            const profilePic =
+                "/" + req.session.userId + "/" + req.file.filename;
+            console.log("/api/Profile´Pic req.body: ", profilePic);
+            await db.updateProfilePic(req.session.userId, profilePic);
+            res.json(profilePic);
+        } catch (err) {
+            console.log("error in api/uploadProfilePic/: ", err);
+            res.json({ error: true });
+        }
     }
-});
+);
 
 app.post("/deleteProfilePic", async (req, res) => {
     const def = ["/default.png"];
@@ -301,7 +306,7 @@ app.get("/api/images/:date", async (req, res) => {
         );
         console.log("/api/images/:date rows: ", rows);
 
-        res.json(rows[0]);
+        res.json(rows);
     } catch (err) {
         console.log("error in /api/images/:date ", err);
         res.json({ error: true });
@@ -348,23 +353,32 @@ app.post("/api/editDiary/:date", async (req, res) => {
 
 app.post("/api/upload/:date", uploader.single("file"), async (req, res) => {
     console.log("/api/upload/:date here");
-    console.log("/api/upload/:date req.body: ", req.body);
+    console.log("/api/upload/:date file: ", req.file.filename);
+    const image = [];
+    image.push("/" + req.session.userId + "/" + req.file.filename);
+    console.log("/api/upload/:date image: ", image);
     console.log("/api/upload/:date req.params: ", req.params.date);
-    // const { rows } = await db.insertPictureData(req.session.userId, req.params.date);
-    // console.log("/api/day/:date rows: ", rows);
+    await db.insertPictureData(req.session.userId, req.params.date, image);
 
-    // res.json(rows[0]);
-    res.json({ success: true });
+    res.json(image);
 });
 
 app.post("/api/uploads/:date", uploader.array("files"), async (req, res) => {
     console.log("/api/uploads/:date here");
-    console.log("/api/uploads/:date req.params: ", req.params.date);
-    // const { rows } = await db.insertPictureData(req.session.userId, req.params.date);
-    // console.log("/api/day/:date rows: ", rows);
+    console.log("/api/uploads/:date req.files: ", req.files);
 
-    // res.json(rows[0]);
-    res.json({ success: true });
+    const images = req.files.map((element) => {
+        return "/" + req.session.userId + "/" + element.filename;
+    });
+
+    console.log("/apiuploads/:date rows: ", images);
+    const arr = images.map((e) => new Array(e));
+    console.log("array in uploads: ", arr);
+    arr.map((e) =>
+        db.insertPictureData(req.session.userId, req.params.date, e)
+    );
+
+    res.json(arr);
 });
 
 //

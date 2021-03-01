@@ -11,28 +11,27 @@ export default function (props) {
     ]);
 
     const selectedDay = props.selectedDay;
-    console.log("props in input tables: ", selectedDay);
-    // inputFields = useSelector((state) => state.inputFields);
-
+    // console.log("props in input tables: ", selectedDay);
+    // const inputFieldsFromRedux = useSelector((state) => state.inputFields);
+    // console.log("inputfields from redux:", inputFieldsFromRedux);
     // useEffect(() => {
-    //     if (inputFields) {
+    //     if (inputFieldsFromRedux) {
     //         console.log("input changed");
     //     }
     // }, [inputFields]);
 
     const handleChange = (index, e) => {
-        console.log(
-            "handleChange name:val: ",
-            e.target.name + ":" + e.target.value,
-            index
-        );
+        // console.log(
+        //     "handleChange name:val: ",
+        //     e.target.name + ":" + e.target.value,
+        //     index
+        // );
         const values = [...inputFields];
         values[index][e.target.name] = e.target.value;
         setInputFields(values);
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
         console.log("saved inputFields: ", inputFields);
         try {
             await axios.post("/api/editDiary/" + selectedDay, inputFields);
@@ -45,17 +44,18 @@ export default function (props) {
     const addField = (index) => {
         // setInputFields([...inputFields, { title: "", content: "" }]);
         console.log("add index: ", index);
-        const values = [...inputFields];
-        values.splice(index + 1, 0, { title: "", content: "" });
+        const values = [...inputFields, { title: "", content: "" }];
+        // values.splice(index + 1, 0, { title: "", content: "" });
         setInputFields(values);
-        dispatch(saveInputFields([selectedDay, inputFields]));
+        dispatch(saveInputFields(inputFields));
+        handleSubmit(values);
     };
     const deleteField = (index) => {
         console.log("delete index: ", index);
         const values = [...inputFields];
         values.splice(index, 1);
         setInputFields(values);
-        dispatch(saveInputFields([selectedDay, inputFields]));
+        dispatch(saveInputFields(inputFields));
     };
 
     return (

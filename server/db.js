@@ -104,13 +104,13 @@ module.exports.getAllUserInfo2 = (id) => {
 
 module.exports.getDayInfo = (id, date) => {
     const q = `SELECT *
-    FROM diaryData WHERE diaryOwner_id = ($1) AND date = ($2)`;
+    FROM diaryData WHERE diaryOwner_id = ($1) AND diary_date = ($2)`;
     const params = [id, date];
     return db.query(q, params);
 };
 
 module.exports.insertDiaryInfo = (id, date, inputFields) => {
-    const q = `INSERT INTO diaryData (diaryOwner_id, date, inputFields) VALUES (($1), ($2), ($3))`;
+    const q = `INSERT INTO diaryData (diaryOwner_id, diary_date, inputFields) VALUES (($1), ($2), ($3))`;
     const params = [id, date, inputFields];
     return db.query(q, params);
 };
@@ -122,14 +122,20 @@ module.exports.getDiaryEntries = (id) => {
 };
 
 module.exports.getEntryDays = (id) => {
-    const q = `SELECT date
+    const q = `SELECT diary_date
     FROM diaryData WHERE diaryOwner_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };
 
 module.exports.insertPictureData = (id, date, pictures) => {
-    const q = `INSERT INTO pictureData (pictureOwner_id, date, pictures) VALUES (($1), ($2), ($3))`;
+    const q = `INSERT INTO pictureData (pictureOwner_id, pic_date, pictures) VALUES (($1), ($2), ($3))`;
     const params = [id, date, pictures];
+    return db.query(q, params);
+};
+
+module.exports.getImagesForDayInfo = (id, date) => {
+    const q = `SELECT * FROM pictureData WHERE pictureOwner_id = ($1) AND pic_date= ($2)`;
+    const params = [id, date];
     return db.query(q, params);
 };

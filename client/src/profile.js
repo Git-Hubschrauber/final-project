@@ -14,15 +14,15 @@ export default function () {
         sex,
         hobbies,
         about,
-        profilePic,
+        profilepic,
     } = profile_data;
-
+    console.log(" profilepic: ", profilepic);
     return (
         <div className="profile">
             <div className="flexbox1">
                 <img
                     className="profPicInProfile"
-                    src={profilePic || "/default.png"}
+                    src={profilepic || "/default.png"}
                 />
             </div>
             <div>
