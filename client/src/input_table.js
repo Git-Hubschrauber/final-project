@@ -6,7 +6,7 @@ import axios from "./axios";
 export default function (props) {
     const dispatch = useDispatch();
 
-    const [inputFields, setInputFields] = useState([
+    const [inputFields1, setInputFields] = useState([
         { title: "", content: "" },
     ]);
 
@@ -26,16 +26,18 @@ export default function (props) {
         //     e.target.name + ":" + e.target.value,
         //     index
         // );
-        const values = [...inputFields];
+        e.preventDefault();
+        const values = [...inputFields1];
         values[index][e.target.name] = e.target.value;
         setInputFields(values);
     };
 
     const handleSubmit = async (e) => {
-        console.log("saved inputFields: ", inputFields);
+        e.preventDefault();
+        console.log("saved inputFields: ", inputFields1);
         try {
-            await axios.post("/api/editDiary/" + selectedDay, inputFields);
-            dispatch(saveInputFields(inputFields));
+            await axios.post("/api/editDiary/" + selectedDay, inputFields1);
+            dispatch(saveInputFields(inputFields1));
         } catch (err) {
             console.log("error in saveInputFields", err);
         }
@@ -44,24 +46,26 @@ export default function (props) {
     const addField = (index) => {
         // setInputFields([...inputFields, { title: "", content: "" }]);
         console.log("add index: ", index);
-        const values = [...inputFields, { title: "", content: "" }];
-        // values.splice(index + 1, 0, { title: "", content: "" });
+        // const values = [...inputFields, { title: "", content: "" }];
+
+        const values = [...inputFields1];
+
+        values.splice(index + 1, 0, { title: "", content: "" });
         setInputFields(values);
-        dispatch(saveInputFields(inputFields));
-        handleSubmit(values);
+        // dispatch(saveInputFields(inputFields));
     };
     const deleteField = (index) => {
         console.log("delete index: ", index);
-        const values = [...inputFields];
+        const values = [...inputFields1];
         values.splice(index, 1);
         setInputFields(values);
-        dispatch(saveInputFields(inputFields));
+        // dispatch(saveInputFields(inputFields));
     };
 
     return (
         <div className="inputTable">
             <form onSubmit={handleSubmit}>
-                {inputFields.map((inputField, index) => (
+                {inputFields1.map((inputField, index) => (
                     <div key={index}>
                         <table>
                             <tbody>

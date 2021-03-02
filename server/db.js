@@ -139,3 +139,20 @@ module.exports.getImagesForDayInfo = (id, date) => {
     const params = [id, date];
     return db.query(q, params);
 };
+
+module.exports.getAllPictures = (id) => {
+    const q = `SELECT * FROM pictureData WHERE pictureOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+module.exports.getAllEntries = (id) => {
+    const q = `SELECT * FROM diaryData WHERE diaryOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.searchUsers = (val) => {
+    const q = `SELECT * FROM registered_users WHERE first ILIKE ($1) ORDER BY first ASC LIMIT 5`;
+    const params = [val + "%"];
+    return db.query(q, params);
+};

@@ -84,20 +84,13 @@ export async function getEntryDays() {
     }
 }
 
-export async function saveInputFields(inputFields) {
-    console.log("saveInputFields in action.js: ", inputFields);
+export async function saveInputFields(inputFields1) {
+    console.log("saveInputFields in action.js: ", inputFields1);
 
-    try {
-        // await axios.post("/api/editDiary/" + selectedDay, inputFields);
-        // // console.log("Profile_data after axios action: ", profile_data);
-
-        return {
-            type: "INPUTFIELDS",
-            inputFields,
-        };
-    } catch (err) {
-        console.log("error in saveInputFields", err);
-    }
+    return {
+        type: "INPUTFIELDS",
+        inputFields1,
+    };
 }
 export async function getImagesOfDay(selectedDay) {
     console.log("getImagesOfDay in action.js: ", selectedDay);
@@ -122,4 +115,34 @@ export async function addNewPictures(picsOfDay) {
         type: "NEW_IMAGES_ADDED",
         picsOfDay,
     };
+}
+
+export async function getAllImages() {
+    try {
+        const results = await axios.get("/api/pictures");
+
+        console.log("allImages after axios action: ", results.data);
+        const allImages = results.data;
+        return {
+            type: "ALL_IMAGES",
+            allImages,
+        };
+    } catch (err) {
+        console.log("error in getAllImages", err);
+    }
+}
+
+export async function getAllEntries() {
+    try {
+        const results = await axios.get("/api/entries");
+
+        console.log("allEnries after axios action: ", results.data);
+        const allEntries = results.data;
+        return {
+            type: "ALL_ENTRIES",
+            allEntries,
+        };
+    } catch (err) {
+        console.log("error in getAllEntries", err);
+    }
 }

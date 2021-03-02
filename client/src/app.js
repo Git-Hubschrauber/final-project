@@ -7,6 +7,10 @@ import Logout from "./logout";
 import DatePicker from "./date_picker";
 // import TimePicker from "./time_picker";
 import EditProfile from "./edit_profile";
+import Pictures from "./pictures";
+import Entries from "./entries";
+import FindUser from "./findUser";
+
 import SingleDay from "./singleDay";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -68,7 +72,10 @@ export default function App() {
                         <Link to="/Entries">Entries</Link>
                     </h2>
                     <h2>
-                        <Link to="/Search">Search</Link>
+                        <Link to="/Places">Places</Link>
+                    </h2>
+                    <h2>
+                        <Link to="/Community">Community</Link>
                     </h2>
 
                     <h2 className="navName">{data.first + " " + data.last}</h2>
@@ -85,7 +92,7 @@ export default function App() {
                     render={() => (
                         <div>
                             <h1>Welcome / main page</h1>
-                            <Maps />
+
                             {/* <TimePicker /> */}
                         </div>
                     )}
@@ -107,6 +114,50 @@ export default function App() {
                     path="/day/:date"
                     render={(props) => (
                         <SingleDay
+                            key={props.match.url}
+                            match={props.match}
+                            history={props.history}
+                        />
+                    )}
+                />
+
+                <Route
+                    path="/map"
+                    render={(props) => (
+                        <Maps
+                            key={props.match.url}
+                            match={props.match}
+                            history={props.history}
+                        />
+                    )}
+                />
+
+                <Route
+                    path="/pictures"
+                    render={(props) => (
+                        <Pictures
+                            key={props.match.url}
+                            match={props.match}
+                            history={props.history}
+                        />
+                    )}
+                />
+
+                <Route
+                    path="/entries"
+                    render={(props) => (
+                        <Entries
+                            key={props.match.url}
+                            match={props.match}
+                            history={props.history}
+                        />
+                    )}
+                />
+
+                <Route
+                    path="/community"
+                    render={(props) => (
+                        <FindUser
                             key={props.match.url}
                             match={props.match}
                             history={props.history}

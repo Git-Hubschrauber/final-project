@@ -37,6 +37,14 @@ export function reducer(state = {}, action) {
         };
     }
 
+    if (action.type === "INPUTFIELDS1") {
+        console.log("reducer inputFields1: ", action.inputFields1);
+        state = {
+            ...state,
+            inputFields1: action.inputFields1,
+        };
+    }
+
     if (action.type === "INPUTFIELDS") {
         console.log("reducer inputFields: ", action.inputFields);
         state = {
@@ -44,6 +52,7 @@ export function reducer(state = {}, action) {
             inputFields: action.inputFields,
         };
     }
+
     if (action.type === "IMAGES_OF_DAY") {
         console.log("reducer IMAGES_OF_DAY: ", action.picsOfDay);
         state = {
@@ -59,12 +68,22 @@ export function reducer(state = {}, action) {
             ...state,
             picsOfDay: [...state.picsOfDay, newObj],
         };
+    }
 
-        // const profile_data = {
-        //     ...state.picsOfDay,
-        //     pictures: [...state.pictures, action.picsOfDay],
-        // };
-        // return { ...state, picsOfDay };
+    if (action.type === "ALL_IMAGES") {
+        console.log("reducer ALL_IMAGES: ", action.allImages);
+        state = {
+            ...state,
+            allImages: action.allImages,
+        };
+    }
+
+    if (action.type === "ALL_ENTRIES") {
+        console.log("reducer ALL_ENTRIES: ", action.allEntries);
+        state = {
+            ...state,
+            allEntries: action.allEntries,
+        };
     }
 
     return state;

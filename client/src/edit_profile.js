@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { saveProfile } from "./actions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProfilePic from "./profile_picture";
 
 import { Link } from "react-router-dom";
@@ -21,6 +21,16 @@ export default function (props) {
     const [sex, setSex] = useState("");
     const [hobbies, setHobbies] = useState("");
     const [about, setAbout] = useState("");
+
+    useEffect(() => {
+        setInputFirst(data.first);
+        setInputLast(data.last);
+        setAge(data.age);
+        setUsername(data.username);
+        setSex(data.sex);
+        setHobbies(data.hobbies);
+        setAbout(data.about);
+    }, [data]);
 
     let today = new Date();
     const dd = String(today.getDate()).padStart(2, "0");
@@ -43,7 +53,7 @@ export default function (props) {
                         className="profPicInProfile"
                         src={data.profilepic || "/default.png"}
                     />
-                    <ProfilePic />{" "}
+                    <ProfilePic />
                 </div>
             </div>
             <div>
@@ -57,10 +67,12 @@ export default function (props) {
                             </td>
                             <td>
                                 <input
+                                    value={first}
                                     required
                                     type="text"
                                     name="first"
                                     onChange={(e) => {
+                                        console.log("halloooooooo");
                                         setInputFirst(e.target.value);
                                     }}
                                 ></input>
@@ -72,6 +84,7 @@ export default function (props) {
                             </td>
                             <td>
                                 <input
+                                    value={last}
                                     required
                                     type="text"
                                     name="last"
@@ -87,6 +100,7 @@ export default function (props) {
                             </td>
                             <td>
                                 <input
+                                    value={age}
                                     type="number"
                                     name="age"
                                     min="0"
@@ -143,6 +157,7 @@ export default function (props) {
                             </td>
                             <td>
                                 <input
+                                    value={username}
                                     type="text"
                                     name="username"
                                     onChange={(e) => {
@@ -157,6 +172,7 @@ export default function (props) {
                             </td>
                             <td>
                                 <input
+                                    value={hobbies}
                                     type="text"
                                     name="hobbies"
                                     onChange={(e) => {
@@ -171,6 +187,7 @@ export default function (props) {
                             </td>
                             <td>
                                 <textarea
+                                    value={about}
                                     className="aboutYourself"
                                     name="aboutYourself"
                                     onChange={(e) => {

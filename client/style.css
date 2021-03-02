@@ -285,6 +285,7 @@ input {
     margin-left: 5vw;
     display: flex;
     flex-wrap: wrap;
+    width: 95vw;
 }
 .galleryImg {
     height: 200px;
@@ -304,4 +305,18 @@ input {
 
 .pictureGalleryHeadlines {
     margin-left: 5vw;
+}
+
+.pictureDate {
+    width: 95vw;
+}
+.findpeople {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-evenly;
+}
+.findpeople img {
+    width: 150px;
+    height: 150px;
 }

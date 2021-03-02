@@ -329,8 +329,9 @@ app.get("/api/getEntryDays", async (req, res) => {
     console.log("/api/getEntryDays");
     try {
         const { rows } = await db.getEntryDays(req.session.userId);
-        console.log("/api/getEntryDays rows: ", rows);
-        res.json(rows);
+        const results = [...new Set(rows)];
+        console.log("/api/getEntryDays results: ", results);
+        res.json(results);
     } catch (err) {
         console.log("error in /api/getEntryDays: ", err);
         res.json({ error: true });
@@ -379,6 +380,33 @@ app.post("/api/uploads/:date", uploader.array("files"), async (req, res) => {
     );
 
     res.json(arr);
+});
+
+app.get("/api/pictures", async (req, res) => {
+    console.log("/pictures in server here");
+    const { rows } = await db.getAllPictures(req.session.userId);
+    console.log("/pictures in server - results: ", rows);
+    res.json(rows);
+});
+
+app.get("/api/entries", async (req, res) => {
+    console.log("/entries in server here");
+    const { rows } = await db.getAllEntries(req.session.userId);
+    console.log("/entries in server - results: ", rows);
+    res.json(rows);
+});
+
+//
+//
+app.post("/api/searchUsers/:searchedUser", async (req, res) => {
+    console.log("req.body: ", req.body);
+    console.log(" req.params.searchedUser: ", req.params.searchedUser);
+
+    let val = req.params.searchedUser;
+    let results = await db.searchUsers(val);
+    console.log("/searchuser results: ", results.rows);
+
+    res.json(results.rows);
 });
 
 //
