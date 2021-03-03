@@ -5,11 +5,14 @@ import axios from "./axios";
 import Profile from "./profile";
 import Logout from "./logout";
 import DatePicker from "./date_picker";
-// import TimePicker from "./time_picker";
+
 import EditProfile from "./edit_profile";
 import Pictures from "./pictures";
 import Entries from "./entries";
 import FindUser from "./findUser";
+import Friends from "./friends";
+import OtherProfile from "./other_profile";
+import Chat from "./chat";
 
 import SingleDay from "./singleDay";
 import { useEffect } from "react";
@@ -77,6 +80,9 @@ export default function App() {
                     <h2>
                         <Link to="/Community">Community</Link>
                     </h2>
+                    <h2>
+                        <Link to="/Chat">Chat</Link>
+                    </h2>
 
                     <h2 className="navName">{data.first + " " + data.last}</h2>
                     <img
@@ -92,8 +98,6 @@ export default function App() {
                     render={() => (
                         <div>
                             <h1>Welcome / main page</h1>
-
-                            {/* <TimePicker /> */}
                         </div>
                     )}
                 />
@@ -158,6 +162,17 @@ export default function App() {
                     path="/community"
                     render={(props) => (
                         <FindUser
+                            key={props.match.url}
+                            match={props.match}
+                            history={props.history}
+                        />
+                    )}
+                />
+                <Route path="/chat" render={() => <Chat />} />
+                <Route
+                    path="/user/:id"
+                    render={(props) => (
+                        <OtherProfile
                             key={props.match.url}
                             match={props.match}
                             history={props.history}

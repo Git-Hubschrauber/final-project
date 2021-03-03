@@ -2,7 +2,7 @@ import axios from "./axios";
 // import React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewPictures } from "./actions";
+import { addNewPictures, addEntryDate } from "./actions";
 import BackBtn from "./hooks/backBtn";
 import { useHistory, Link } from "react-router-dom";
 
@@ -26,6 +26,7 @@ export default function (props) {
         let response = await axios.post("/api/upload/" + selectedDay, formData);
         console.log("response in uploader 1: ", response.data);
         dispatch(addNewPictures(response.data));
+        dispatch(addEntryDate(selectedDay));
         setUploader1(false);
     };
 
@@ -45,6 +46,8 @@ export default function (props) {
         );
         console.log("response in uploader 2: ", response.data);
         response.data.map((e) => dispatch(addNewPictures(e)));
+        dispatch(addEntryDate(selectedDay));
+
         setUploader2(false);
     };
 

@@ -83,7 +83,7 @@ module.exports.updateProfilePic = (id, profilePic) => {
 };
 
 module.exports.deleteImage = (id, def) => {
-    const q = `UPDATE users SET profile_pic_url = ($2) WHERE id =($1)`;
+    const q = `UPDATE registered_users SET profilePic = ($2) WHERE id =($1)`;
     const params = [id, def];
     return db.query(q, params);
 };
@@ -121,9 +121,16 @@ module.exports.getDiaryEntries = (id) => {
     return db.query(q, params);
 };
 
-module.exports.getEntryDays = (id) => {
+module.exports.getEntryDays1 = (id) => {
     const q = `SELECT diary_date
     FROM diaryData WHERE diaryOwner_id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getEntryDays2 = (id) => {
+    const q = `SELECT pic_date
+    FROM pictureData WHERE pictureOwner_id = ($1)`;
     const params = [id];
     return db.query(q, params);
 };
@@ -151,8 +158,151 @@ module.exports.getAllEntries = (id) => {
     return db.query(q, params);
 };
 
+//
+//
+//
+
+module.exports.getUserInfo = (id) => {
+    const q = `SELECT * FROM registered_users
+    WHERE id = ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+// module.exports.getUserInfo = (id) => {
+//     const q = `SELECT *
+//     FROM  editProfileData
+//     JOIN registered_users ON (registered_users.id = ($1) OR editProfileData.profileOwner_id = ($1))`;
+//     const params = [id];
+//     return db.query(q, params);
+// };
+
 module.exports.searchUsers = (val) => {
     const q = `SELECT * FROM registered_users WHERE first ILIKE ($1) ORDER BY first ASC LIMIT 5`;
     const params = [val + "%"];
+    return db.query(q, params);
+};
+
+module.exports.getFriendshipStatus = (sender_id, recipient_id) => {
+    const q = `SELECT * FROM friendships WHERE (recipient_id = ($1) AND sender_id = ($2)) OR (recipient_id = ($2) AND sender_id = ($1))`;
+    const params = [sender_id, recipient_id];
+    return db.query(q, params);
+};
+
+module.exports.makeFriendship = (sender_id, recipient_id) => {
+    const q = `INSERT INTO friendships (sender_id, recipient_id, accepted) VALUES (($1),($2), FALSE)`;
+    const params = [sender_id, recipient_id];
+    return db.query(q, params);
+};
+
+module.exports.acceptFriendship = (sender_id, recipient_id) => {
+    const q = `UPDATE friendships SET accepted = TRUE WHERE (sender_id = ($1) AND recipient_id = ($2))`;
+    const params = [sender_id, recipient_id];
+    return db.query(q, params);
+};
+
+module.exports.cancelFriendship = (sender_id, recipient_id) => {
+    const q = `DELETE FROM friendships WHERE (recipient_id = ($1) AND sender_id = ($2)) OR (recipient_id = ($2) AND sender_id = ($1))`;
+    const params = [sender_id, recipient_id];
+    return db.query(q, params);
+};
+
+module.exports.getFriends = (id) => {
+    const q = `Select * FROM friendships WHERE (sender_id = ($1) AND accepted = TRUE) OR (recipient_id = ($1) AND accepted = TRUE)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getFriendsandRequests = (id) => {
+    const q = `SELECT registered_users.id, first, last, profilePic, accepted, sender_id, recipient_id 
+    FROM friendships
+    JOIN registered_users
+    ON (recipient_id = $1 AND sender_id = registered_users.id)
+    OR (sender_id = $1 AND recipient_id = registered_users.id)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getOthersFriends = (id) => {
+    const q = `SELECT registered_users.id, first, last, profilePic, accepted, sender_id, recipient_id 
+    FROM friendships
+    JOIN registered_users
+    ON (recipient_id = $1 AND sender_id = registered_users.id AND accepted = TRUE)
+    OR (sender_id = $1 AND recipient_id = registered_users.id AND accepted = TRUE)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+//
+//
+//
+
+module.exports.getOnlineUsers = (elem) => {
+    const q = `Select * FROM registered_users WHERE id = ANY($1)`;
+    const params = [elem];
+    return db.query(q, params);
+};
+
+module.exports.getFriendsandRequests = (id) => {
+    const q = `SELECT registered_users.id, first, last, profilePic, accepted, sender_id, recipient_id 
+    FROM friendships
+    JOIN registered_users
+    ON (recipient_id = $1 AND sender_id = registered_users.id)
+    OR (sender_id = $1 AND recipient_id = registered_users.id)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getOthersFriends = (id) => {
+    const q = `SELECT registered_users.id, first, last, profilePic, accepted, sender_id, recipient_id 
+    FROM friendships
+    JOIN registered_users
+    ON (recipient_id = $1 AND sender_id = registered_users.id AND accepted = TRUE)
+    OR (sender_id = $1 AND recipient_id = registered_users.id AND accepted = TRUE)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.getLastMessages = () => {
+    const q = `SELECT first, last, profilePic, chat.id, mes_sender_id, sent_message, sent_timestamp
+    FROM chat
+    JOIN registered_users ON (mes_sender_id = registered_users.id) ORDER BY chat.id DESC LIMIT 10`;
+    return db.query(q);
+};
+
+module.exports.insertMessage = (sender_id, message) => {
+    const q = `INSERT INTO chat (mes_sender_id, sent_message) VALUES (($1),($2))`;
+    const params = [sender_id, message];
+    return db.query(q, params);
+};
+
+module.exports.getLastMessageInfo = () => {
+    const q = `SELECT first, last, profilePic, chat.id, mes_sender_id, sent_message, sent_timestamp
+    FROM chat
+    JOIN registered_users ON (mes_sender_id = registered_users.id) ORDER BY chat.id DESC LIMIT 1`;
+    return db.query(q);
+};
+
+module.exports.deleteAccountChat = (id) => {
+    const q = `DELETE
+    FROM chat
+    WHERE  mes_sender_id =  ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.deleteAccountFriendships = (id) => {
+    const q = `DELETE
+    FROM friendships
+    WHERE  recipient_id = ($1) OR sender_id =  ($1)`;
+    const params = [id];
+    return db.query(q, params);
+};
+
+module.exports.deleteAccountUsers = (id) => {
+    const q = `DELETE
+    FROM registered_users
+    WHERE  id = ($1)`;
+    const params = [id];
     return db.query(q, params);
 };

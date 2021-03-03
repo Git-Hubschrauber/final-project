@@ -64,16 +64,25 @@ export async function getDayInfo(props) {
     }
 }
 
+export async function addEntryDate(newDate) {
+    try {
+        console.log("addEntryDate in actions: ", newDate);
+        return {
+            type: "ADD_ENTRY_DATE",
+            newDate,
+        };
+    } catch (err) {
+        console.log("error in addEntryDate", err);
+    }
+}
+
 export async function getEntryDays() {
     console.log("getEntryDays in action.js: ");
 
     try {
         const results = await axios.get("/api/getEntryDays");
 
-        console.log(
-            "getEntryDays after axios action: ",
-            results.data.diary_date
-        );
+        console.log("getEntryDays after axios action: ", results);
         const entryDays = results.data;
         return {
             type: "ENTRYDAYS",
@@ -146,3 +155,174 @@ export async function getAllEntries() {
         console.log("error in getAllEntries", err);
     }
 }
+
+//
+//
+//
+//
+
+export async function getUserInfo(id) {
+    const resp = await axios.get("/api/user/" + id);
+
+    console.log("resp. in otherProfile: ", resp.data.userInfo);
+    const userInfo = resp.data.userInfo;
+    console.log("friendship in otherProfile: ", resp.data.friendship);
+    return {
+        type: "USER_INFO",
+        userInfo,
+    };
+}
+
+export async function askForFriendsandRequests() {
+    const { data } = await axios.get("/api/friends");
+    console.log("data.friendships in actions ", data.friendships);
+
+    return {
+        type: "FRIENDSHIPSTATUS_REQUEST",
+        usersForFriendship: data.friendships,
+    };
+}
+
+export async function unfriend(id) {
+    await axios.post("/api/cancelInvitation/" + id);
+    console.log("unfriend button clicked: ", id);
+
+    const { data } = await axios.get("/api/friends");
+    return {
+        type: "FRIENDSHIPSTATUS_REQUEST",
+        usersForFriendship: data.friendships,
+        loggedUser: data.loggedUser,
+    };
+}
+
+export async function checkFriendshipStatus(id) {
+    console.log("checkFriendshipStatus executed: ", id);
+
+    const results = await axios.get("/api/user/" + id);
+    // console.log(
+    //     "checkFriendshipStatus recipient in actions: ",
+    //     results.data.friendship.recipient_id
+    // );
+    // console.log(
+    //     "checkFriendshipStatus sender in actions: ",
+    //     results.data.friendship.sender_id
+    // );
+    return {
+        type: "FRIENDSHIPSTATUS_CHECK",
+        checkedId: id,
+        friendshipStatus: results.data.friendship.accepted,
+        sender_id: results.data.friendship.sender_id,
+        recipient_id: results.data.friendship.recipient_id,
+    };
+}
+
+//
+//
+//
+export async function makeFriendship(id) {
+    try {
+        axios.post("/api/userInvitation/" + id);
+        return {
+            type: "SET_FRIENDSHIPSTATUS",
+            friendshipStatus: "sent",
+        };
+    } catch (err) {
+        console.log("err in makeFriendship", err);
+    }
+}
+
+export async function acceptFriendship(id) {
+    try {
+        await axios.post("/api/acceptInvitation/" + id);
+        console.log("accept button clicked: ", id);
+
+        const { data } = await axios.get("/api/friends");
+        return {
+            type: "SET_FRIENDSHIPSTATUS",
+            friendshipStatus: "accepted",
+            // usersForFriendship: data.friendships,
+        };
+    } catch (err) {
+        console.log("err in acceptFriendship", err);
+    }
+}
+
+export async function cancelFriendship(id) {
+    try {
+        await axios.post("/api/cancelInvitation/" + id);
+
+        return {
+            type: "SET_FRIENDSHIPSTATUS",
+            friendshipStatus: "none",
+        };
+    } catch (err) {
+        console.log("err in acceptFriendship", err);
+    }
+}
+
+//
+//
+//
+// Chat
+
+export function chatMessages(msgs) {
+    console.log("last 10 chat messages: ", msgs);
+
+    return { type: "MESSAGES", messages: msgs };
+}
+
+export function chatMessage(msg) {
+    console.log("chat messages sent: ", msg);
+
+    return { type: "MESSAGE", message: msg };
+}
+
+export function sendNewMessage(newMessage) {
+    console.log("just posted message: ", newMessage);
+
+    return {
+        type: "NEW_MESSAGE",
+        newMessage,
+    };
+}
+
+export async function getOthersFriends(id) {
+    const { data } = await axios.get("/api/viewFriends/" + id);
+    const friends = data.reverse();
+    console.log("actions resp. from /api/viewFriends/: ", friends);
+
+    return {
+        type: "OTHERS_FRIENDS",
+        friends,
+    };
+}
+
+export function OtherOnlineUsers(otherOnlineUsersData) {
+    return {
+        type: "OTHERS_ONLINEUSERS",
+        otherOnlineUsersData,
+    };
+}
+
+export function newOnlineUser(newUserInfo) {
+    return {
+        type: "NEW_ONLINEUSER",
+        newUserInfo,
+    };
+}
+
+// export function notifyFriendRequest(data) {
+//     console.log("actions notifyFriendRequest: ", data);
+//     socket.emit("request", data.recipient_id);
+//     return {
+//         type: "NOTIFY_FRIENDSHIPREQUEST",
+//         data,
+//     };
+// }
+// export function displayFriendRequest(data_2) {
+//     console.log("actions displayFriendRequest: ", data_2);
+//     return {
+//         type: "NOTIFY_FRIENDSHIPREQUEST_2",
+//         data_2,
+//     };
+// }

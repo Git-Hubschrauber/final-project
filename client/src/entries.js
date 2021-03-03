@@ -18,7 +18,9 @@ export default function () {
 
     let displayElement;
 
-    if (allEntries) {
+    if (!allEntries || allEntries.length === 0) {
+        displayElement = <h1>No entries available</h1>;
+    } else {
         const entryDatesUnsorted = [
             ...new Set(allEntries.map((e) => e.diary_date)),
         ];
@@ -45,8 +47,8 @@ export default function () {
                                                     const y = JSON.parse(x);
                                                     return (
                                                         <div key={index}>
-                                                            {y.title} :
-                                                            {y.content}
+                                                            <h2>{y.title}</h2>
+                                                            <p>{y.content}</p>
                                                         </div>
                                                     );
                                                 }

@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS reset_password;
 DROP TABLE IF EXISTS pictureData;
 DROP TABLE IF EXISTS diaryData;
 DROP TABLE IF EXISTS editProfileData;
+DROP TABLE IF EXISTS chat;
+DROP TABLE IF EXISTS friendships;
 DROP TABLE IF EXISTS registered_users;
 
 
@@ -46,4 +48,20 @@ CREATE TABLE pictureData(
     pictureOwner_id INTEGER,
     pic_date VARCHAR(255),
     pictures VARCHAR[]
+);
+
+CREATE TABLE friendships(
+id SERIAL PRIMARY KEY,
+sender_id INT REFERENCES registered_users(id) NOT NULL,
+recipient_id INT REFERENCES registered_users(id) NOT NULL,
+accepted BOOLEAN DEFAULT false
+);
+
+
+CREATE TABLE chat (
+    
+    id SERIAL PRIMARY KEY,
+    mes_sender_id INT REFERENCES registered_users(id) NOT NULL,
+    sent_message VARCHAR NOT NULL,
+    sent_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

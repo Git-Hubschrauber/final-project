@@ -62,6 +62,7 @@ export default function Maps() {
 
     const mapRef = React.useRef();
     const onMapLoad = React.useCallback((map) => {
+        console.log("map sdsd:", map);
         mapRef.current = map;
     }, []);
 
@@ -78,6 +79,7 @@ export default function Maps() {
             <Search panTo={panTo} />
 
             <GoogleMap
+                onLoad={onMapLoad}
                 mapContainerStyle={containerStyle}
                 center={center}
                 zoom={10}
@@ -139,7 +141,7 @@ function Search({ panTo }) {
                         const results = await getGeocode({ address });
                         const { lat, lng } = await getLatLng(results[0]);
                         console.log(lat, lng);
-                        panTo = { lat, lng };
+                        panTo({ lat, lng });
                     } catch (error) {
                         console.log(error);
                     }

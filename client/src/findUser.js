@@ -1,6 +1,7 @@
 import axios from "./axios";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Friends from "./friends";
 
 export default function () {
     const [searchUsers, setSearchUsers] = useState([]);
@@ -50,6 +51,7 @@ export default function () {
                     );
                 })}
             </div>
+            <Friends />
             <Link to={"/"}>
                 <button className="backBtn">BACK</button>
             </Link>

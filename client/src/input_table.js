@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { saveInputFields } from "./actions";
+import { saveInputFields, addEntryDate } from "./actions";
 import axios from "./axios";
 
 export default function (props) {
@@ -38,6 +38,7 @@ export default function (props) {
         try {
             await axios.post("/api/editDiary/" + selectedDay, inputFields1);
             dispatch(saveInputFields(inputFields1));
+            dispatch(addEntryDate(selectedDay));
         } catch (err) {
             console.log("error in saveInputFields", err);
         }

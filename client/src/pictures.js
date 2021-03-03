@@ -18,7 +18,9 @@ export default function () {
 
     let displayElement;
 
-    if (allImages) {
+    if (!allImages || allImages.length === 0) {
+        displayElement = <h1>No pictures available</h1>;
+    } else {
         const imageDatesUnsorted = [
             ...new Set(allImages.map((e) => e.pic_date)),
         ];

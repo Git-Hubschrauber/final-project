@@ -1,14 +1,21 @@
 const express = require("express");
 const app = express();
+
+const server = require("http").Server(app);
+const io = require("socket.io")(server, {
+    allowRequest: (req, callback) =>
+        callback(null, req.headers.referer.startsWith("http://localhost:3000")),
+});
+
 const compression = require("compression");
 const path = require("path");
+const db = require("./db");
 const cookieSession = require("cookie-session");
 const { hash, compare } = require("./bc");
 const csurf = require("csurf");
 const { sendEmail } = require("./ses");
 const cryptoRandomString = require("crypto-random-string");
 const fs = require("fs");
-const db = require("./db");
 
 //
 // multer
@@ -46,9 +53,12 @@ if (process.env.NODE_ENV === "production") {
 
 const cookieSessionMiddleware = cookieSession({
     secret: sessionSecret,
-    maxAge: 1000 * 60 * 60,
+    maxAge: 1000 * 60 * 60 * 3,
 });
 app.use(cookieSessionMiddleware);
+io.use(function (socket, next) {
+    cookieSessionMiddleware(socket.request, socket.request.res, next);
+});
 app.use(express.json());
 
 app.use(csurf());
@@ -207,7 +217,7 @@ app.get("/api/allUserInfo", async (req, res) => {
     try {
         const results1 = await db.getAllUserInfo1(req.session.userId);
         const results2 = await db.getAllUserInfo2(req.session.userId);
-        const data = { ...results1.rows[0], ...results2.rows[0] };
+        const data = { ...results2.rows[0], ...results1.rows[0] };
 
         console.log("all User Info: ", data);
         res.json(data);
@@ -328,10 +338,21 @@ app.get("/api/getDiaryEntries", async (req, res) => {
 app.get("/api/getEntryDays", async (req, res) => {
     console.log("/api/getEntryDays");
     try {
-        const { rows } = await db.getEntryDays(req.session.userId);
-        const results = [...new Set(rows)];
-        console.log("/api/getEntryDays results: ", results);
-        res.json(results);
+        const { rows } = await db.getEntryDays1(req.session.userId);
+        let resultsA1 = rows.map((e) => Object.values(e));
+        const results = await db.getEntryDays2(req.session.userId);
+        let resultsB1 = results.rows.map((e) => Object.values(e));
+        let resultsAB = [...resultsA1, ...resultsB1];
+        let resultsABC = resultsAB.flat();
+        let uniq = [...new Set(resultsABC)];
+        console.log("/api/getEntryDays resultsB1: ", resultsB1);
+        console.log("/api/getEntryDays resultsA1: ", resultsA1);
+        console.log("/api/getEntryDays resultsAB: ", resultsAB);
+        console.log("/api/getEntryDays resultsABC: ", resultsABC);
+        // console.log("/api/getEntryDays results3: ", results3);
+        // console.log("/api/getEntryDays results3: ", results4);
+        console.log("/api/getEntryDays uniq2: ", uniq);
+        res.json(uniq);
     } catch (err) {
         console.log("error in /api/getEntryDays: ", err);
         res.json({ error: true });
@@ -409,6 +430,107 @@ app.post("/api/searchUsers/:searchedUser", async (req, res) => {
     res.json(results.rows);
 });
 
+app.get("/api/user/:id", async (req, res) => {
+    const userId = req.session.userId;
+    const recipient_id = req.params.id;
+    try {
+        const results1 = await db.getUserInfo(req.params.id);
+        const results2 = await db.getFriendshipStatus(userId, recipient_id);
+
+        return res.json({
+            userInfo: results1.rows[0],
+            error: false,
+            friendship: results2.rows[0],
+        });
+    } catch (err) {
+        console.log("err in /api/user/:id", err);
+        res.json({ error: true });
+    }
+});
+
+app.post("/api/userInvitation/:id", async (req, res) => {
+    const sender_id = req.session.userId;
+    const recipient_id = req.params.id;
+    try {
+        const results = await db.makeFriendship(sender_id, recipient_id);
+
+        console.log("friendship invitation results: ", results);
+        res.json({
+            sender_id: req.session.userId,
+            recipient_id: req.params.id,
+        });
+    } catch (err) {
+        console.log("err in /userInvitation", err);
+        res.json({ error: true });
+    }
+});
+
+app.post("/api/acceptInvitation/:id", async (req, res) => {
+    const sender_id = req.session.userId;
+    const recipient_id = req.params.id;
+    try {
+        await db.acceptFriendship(recipient_id, sender_id);
+        const results = await db.getFriendshipStatus(sender_id, recipient_id);
+
+        console.log("accept invitation results: ", results.rows);
+        res.json(results.rows);
+    } catch (err) {
+        console.log("err in /acceptInvitation", err);
+        res.json({ error: true });
+    }
+});
+
+app.post("/api/cancelInvitation/:id", async (req, res) => {
+    const sender_id = req.session.userId;
+    const recipient_id = req.params.id;
+    try {
+        await db.cancelFriendship(sender_id, recipient_id);
+        res.json({ error: false });
+    } catch (err) {
+        console.log("err in /cancelInvitation", err);
+        res.json({ error: true });
+    }
+});
+
+app.get("/api/friends/", async (req, res) => {
+    const loggedId = req.session.userId;
+
+    try {
+        const { rows } = await db.getFriendsandRequests(loggedId);
+
+        res.json({ friendships: rows, loggedUser: loggedId });
+    } catch (err) {
+        console.log("err in /friends", err);
+        res.json({ error: true });
+    }
+});
+
+app.get("/api/friend/:id", async (req, res) => {
+    try {
+        const { rows } = await db.getUserInfo(req.params.id);
+        console.log("results in /friends/id", rows);
+
+        res.json(rows);
+
+        // console.log("friends: ", friends);
+        // res.json({ results: friends });
+    } catch (err) {
+        console.log("err in /friend/id", err);
+        res.json({ error: true });
+    }
+});
+
+app.get("/api/viewFriends/:id", async (req, res) => {
+    try {
+        const { rows } = await db.getOthersFriends(req.params.id);
+        // console.log("server results in /viewfriends", rows);
+        res.json(rows.reverse());
+    } catch (err) {
+        console.log("err in /friends", err);
+        res.json({ error: true });
+    }
+});
+
 //
 //
 //Logout
@@ -431,6 +553,105 @@ app.get("*", function (req, res) {
 //
 //
 //
-app.listen(process.env.PORT || 3001, function () {
+// app.listen(process.env.PORT || 3001, function () {
+//     console.log("I'm listening.");
+// });
+
+server.listen(process.env.PORT || 3001, function () {
     console.log("I'm listening.");
+});
+let onlineUsers = {};
+let requestToIds = [];
+
+io.on("connection", function (socket) {
+    console.log(`socket with the id ${socket.id} is now connected`);
+
+    const userId = socket.request.session.userId;
+
+    if (!socket.request.session.userId) {
+        console.log("socket disconnected");
+
+        return socket.disconnect(true);
+    }
+
+    //
+    //
+    //
+
+    console.log("onlineUsers in server: ", Object.values(onlineUsers));
+    let onlineUsersIds = Object.values(onlineUsers);
+    let otherOnlineUsersIds = [
+        ...new Set(onlineUsersIds.filter((element) => element !== userId)),
+    ];
+
+    console.log("otherOnlineUsers in server: ", otherOnlineUsersIds);
+    db.getOnlineUsers(otherOnlineUsersIds).then(({ rows }) => {
+        console.log("OtheronlineUsers Data: ", rows);
+        socket.emit("whoElseIsOnline", rows);
+    });
+
+    if (!onlineUsersIds.includes(userId)) {
+        console.log("newUser joined: ", userId);
+        db.getUserInfo(userId).then(({ rows }) => {
+            console.log("server - new user joined: ", rows);
+            let newUserInfo = rows[0];
+            socket.broadcast.emit("newUserJoined", newUserInfo);
+        });
+    }
+    onlineUsers[socket.id] = userId;
+
+    otherOnlineUsersIds = [
+        ...new Set(onlineUsersIds.filter((element) => element !== userId)),
+    ];
+    //
+    //
+
+    db.getLastMessages().then((results) => {
+        io.emit("chatMessages", results.rows.reverse());
+    });
+
+    //
+    //
+
+    socket.on("chatMessage", async (msg) => {
+        try {
+            console.log("msg-data: ", msg);
+            await db.insertMessage(userId, msg);
+            const { rows } = await db.getLastMessageInfo();
+            console.log("sender Info: ", rows[0]);
+            io.emit("newMessage", rows[0]);
+        } catch (err) {
+            console.log("err in server socket chatMessage", err);
+        }
+    });
+
+    // socket.on("request", (data) => {
+    //     console.log("notifyFriendRequest in server: ", data);
+    //     requestToIds.push(parseInt(data));
+    // });
+
+    // let numberOfRequests = requestToIds.filter((v) => v == userId).length;
+
+    // if (numberOfRequests > 0) {
+    //     socket.emit("displayFriendRequest", numberOfRequests);
+    // }
+    // console.log("requestToIds 2: ", requestToIds);
+    // console.log("numberOfRequests 2: ", numberOfRequests);
+
+    socket.on("disconnect", () => {
+        delete onlineUsers[socket.id];
+        console.log(
+            "onlineUsers in server after a disconnect: ",
+            Object.values(onlineUsers)
+        );
+        onlineUsersIds = Object.values(onlineUsers);
+        otherOnlineUsersIds = [
+            ...new Set(onlineUsersIds.filter((element) => element !== userId)),
+        ];
+        db.getOnlineUsers(otherOnlineUsersIds).then(({ rows }) => {
+            console.log("OtheronlineUsers Data: ", rows);
+            socket.broadcast.emit("whoElseIsOnline", rows);
+        });
+        console.log(`Socket with id: ${socket.id} just DISCONNECTED!!!!`);
+    });
 });

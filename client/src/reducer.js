@@ -37,6 +37,14 @@ export function reducer(state = {}, action) {
         };
     }
 
+    if (action.type === "ADD_ENTRY_DATE") {
+        console.log("reducer ADD_ENTRY_DATE: ", action.newDate);
+        state = {
+            ...state,
+            entryDays: [...state.entryDays, action.newDate],
+        };
+    }
+
     if (action.type === "INPUTFIELDS1") {
         console.log("reducer inputFields1: ", action.inputFields1);
         state = {
@@ -83,6 +91,105 @@ export function reducer(state = {}, action) {
         state = {
             ...state,
             allEntries: action.allEntries,
+        };
+    }
+
+    //
+    //
+    //
+
+    if (action.type === "USER_INFO") {
+        console.log("userInfo in reducer: ", action.userInfo);
+        state = {
+            ...state,
+            userInfo: action.userInfo,
+        };
+    }
+
+    if (action.type === "SET_FRIENDSHIPSTATUS") {
+        console.log(
+            "reducer action.friendshipStatus: ",
+            action.friendshipStatus
+        );
+        state = {
+            ...state,
+
+            friendshipStatus: action.friendshipStatus,
+        };
+    }
+    if (action.type === "FRIENDSHIPSTATUS_REQUEST") {
+        console.log(
+            "reducer action.usersForFriendship: ",
+            action.usersForFriendship
+        );
+        state = {
+            ...state,
+            usersForFriendship: action.usersForFriendship,
+        };
+    }
+
+    if (action.type === "FRIENDSHIPSTATUS_CHECK") {
+        state = {
+            ...state,
+            checkedId: action.checkedId,
+            friendshipStatus: action.friendshipStatus,
+            sender_id: action.sender_id,
+            recipient_id: action.recipient_id,
+        };
+    }
+
+    if (action.type === "OTHERS_FRIENDS") {
+        state = {
+            ...state,
+            friends: action.friends,
+        };
+    }
+
+    //
+    //
+    if (action.type === "MESSAGES") {
+        state = {
+            ...state,
+            messages: action.messages,
+        };
+    }
+
+    if (action.type === "MESSAGE") {
+        state = {
+            ...state,
+            message: action.message,
+        };
+    }
+
+    if (action.type === "NEW_MESSAGE") {
+        state = {
+            ...state,
+            messages: [...state.messages, action.newMessage],
+        };
+    }
+
+    if (action.type === "OTHERS_FRIENDS") {
+        state = {
+            ...state,
+            friends: action.friends,
+        };
+    }
+
+    if (action.type === "OTHERS_ONLINEUSERS") {
+        console.log(
+            "action.otherOnlineUsersData: ",
+            action.otherOnlineUsersData
+        );
+        state = {
+            ...state,
+            otherOnlineUsers: action.otherOnlineUsersData,
+        };
+    }
+
+    if (action.type === "NEW_ONLINEUSER") {
+        state = {
+            ...state,
+            otherOnlineUsers: [...state.otherOnlineUsers, action.newUserInfo],
         };
     }
 
